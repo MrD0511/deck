@@ -1,14 +1,18 @@
-package main
+package stack
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
-
+	"unicode/utf16"
+	"unicode/utf8"
 	"github.com/fatih/color"
 )
 
@@ -39,7 +43,7 @@ type TechStackReport struct {
 	Framework Framework
 }
 
-func detectFramework() ([]TechStackReport, error) {
+func DetectFramework() ([]TechStackReport, error) {
 	cwd, err := os.Getwd()
 
 	if err != nil {
@@ -122,37 +126,82 @@ func searchFileInSubDirs(root string, targets map[string]bool) (map[string]strin
 	return result, nil
 }
 
+func utf16ToUtf8(data []byte) (string, error) {
+	if len(data)%2 != 0 {
+		return "", fmt.Errorf("invalid UTF-16LE data length")
+	}
+
+	// Decode UTF-16LE
+	utf16Data := make([]uint16, len(data)/2)
+	for i := 0; i < len(data); i += 2 {
+		utf16Data[i/2] = uint16(data[i]) | uint16(data[i+1])<<8
+	}
+
+	// Convert UTF-16 to UTF-8
+	utf8Buf := new(bytes.Buffer)
+	for _, r := range utf16.Decode(utf16Data) {
+		if r == utf8.RuneError {
+			return "", fmt.Errorf("invalid UTF-16 data")
+		}
+		utf8Buf.WriteRune(r)
+	}
+
+	return utf8Buf.String(), nil
+}
+
+// Detect Python Framework from requirements.txt
 func detectPythonFramework(filePath string) Framework {
-	data, err := ioutil.ReadFile(filePath)
+	file, err := os.Open(filePath)
 	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return Unknown
+	}
+	defer file.Close()
+
+	// Read file as UTF-16LE
+	reader := bufio.NewReader(file)
+	rawData, err := reader.Peek(2) // Check for BOM
+	if err != nil {
+		fmt.Println("Error reading file header:", err)
 		return Unknown
 	}
 
+	// Detect encoding
+	var data []byte
+	if rawData[0] == 0xFF && rawData[1] == 0xFE { // UTF-16LE BOM
+		buf := new(bytes.Buffer)
+		reader.Discard(2) // Skip BOM
+		for {
+			chunk := make([]byte, 1024)
+			n, err := reader.Read(chunk)
+			buf.Write(chunk[:n])
+			if err != nil {
+				break
+			}
+		}
+		utf8Data, _ := utf16ToUtf8(buf.Bytes()) // Convert to UTF-8 string
+		data = []byte(utf8Data)                 // Convert string to []byte
+	} else {
+		// Assume UTF-8 by default
+		data, _ = io.ReadAll(reader) // Already []byte
+	}
+
 	lines := strings.Split(string(data), "\n")
-	fmt.Println("Reading requirements.txt:", filePath) // Debugging line
 	for _, line := range lines {
 		trimmedLine := strings.TrimSpace(line)
-		if strings.HasPrefix(trimmedLine, "#") || trimmedLine == "" || trimmedLine == "��" {
+		if strings.HasPrefix(trimmedLine, "#") || trimmedLine == "" {
 			continue
 		}
-
-		// Print each line being checked for debugging
-		fmt.Print("Checking line:", trimmedLine)
 
 		lower := strings.ToLower(trimmedLine)
 		switch {
 		case strings.Contains(lower, "flask"):
-			fmt.Println("Found")
 			return Flask
 		case strings.Contains(lower, "fastapi"):
-			fmt.Println("Found")
 			return FastAPI
 		case strings.Contains(lower, "django"):
-			fmt.Println("Found")
 			return Django
 		}
-		fmt.Println("not")
-
 	}
 
 	return Unknown
@@ -221,14 +270,14 @@ func getDependencies(pkg map[string]interface{}, keys ...string) map[string]bool
 	return dependencies
 }
 
-func printTechStackReport(reports []TechStackReport) {
+func PrintTechStackReport(reports []TechStackReport) {
 	// Print header with color
 	color.Cyan("\nTech Stack Detection Report")
-	fmt.Printf("%-35s %-20s %-10s\n", "Directory", "File", "Framework")
+	fmt.Printf("%-45s %-20s %-10s\n", "Directory", "File", "Framework")
 
 	for _, report := range reports {
 		// Color the columns differently
-		DirectoryColor.Printf("%-35s", report.Directory)
+		DirectoryColor.Printf("%-45s", report.Directory)
 		FileColor.Printf("%-20s", report.File)
 
 		if report.Framework == Unknown {
@@ -239,13 +288,13 @@ func printTechStackReport(reports []TechStackReport) {
 	}
 }
 
-func main() {
-	reports, err := detectFramework()
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
+// func main() {
+// 	reports, err := detectFramework()
+// 	if err != nil {
+// 		fmt.Println("Error:", err)
+// 		return
+// 	}
 
-	// Print the report
-	printTechStackReport(reports)
-}
+// 	// Print the report
+// 	printTechStackReport(reports)
+// }

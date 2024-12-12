@@ -1,4 +1,4 @@
-module example/stack
+module github.com/MrD0511/deck
 
 go 1.23.4
 

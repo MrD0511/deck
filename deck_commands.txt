@@ -1,0 +1,30 @@
+deck commands
+
+
+1. deck deploy dir_name 
+
+-find framework if more then one ask user to select
+-show basic details about upcoming docker file like workDir, mainfile, command
+-give customization option
+-create docker file for each
+-create docker-compose.yaml if more than one service
+-build each container (show logs)
+-expose the port
+
+
+2. deck create dockerfile (dir_name or empty)
+
+-find framework if more then one ask user to select
+-show basic details about upcoming docker file like workDir, mainfile, command
+-give customization option
+-create docker file for each
+-gives error if more than one service
+
+
+3. deck create compose (dir_name or empty)
+
+-find framework if more then one ask user to select
+-show basic details about upcoming docker file like workDir, mainfile, command
+-give customization option
+-create docker file for each
+-create docker-compose.yaml if more than one service

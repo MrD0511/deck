@@ -13,6 +13,7 @@ import (
 	"sync"
 	"unicode/utf16"
 	"unicode/utf8"
+
 	"github.com/fatih/color"
 )
 
@@ -43,7 +44,8 @@ type TechStackReport struct {
 	Framework Framework
 }
 
-func DetectFramework() ([]TechStackReport, error) {
+func DetectFramework(dir string) ([]TechStackReport, error) {
+
 	cwd, err := os.Getwd()
 
 	if err != nil {
@@ -51,7 +53,7 @@ func DetectFramework() ([]TechStackReport, error) {
 	}
 
 	files := map[string]bool{"package.json": true, "requirements.txt": true, "go.mod": true}
-	paths, err := searchFileInSubDirs(cwd, files)
+	paths, err := searchFileInSubDirs(dir, files)
 
 	if err != nil {
 		return nil, err
@@ -96,9 +98,15 @@ func DetectFramework() ([]TechStackReport, error) {
 }
 
 func searchFileInSubDirs(root string, targets map[string]bool) (map[string]string, error) {
+	cwd, err := os.Getwd()
+
+	if err != nil {
+		return nil, err
+	}
+
 	result := make(map[string]string)
 
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+	walkErr := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -110,7 +118,7 @@ func searchFileInSubDirs(root string, targets map[string]bool) (map[string]strin
 		name := strings.ToLower(info.Name())
 		if !info.IsDir() {
 			if _, exists := targets[name]; exists {
-				relativePath, err := filepath.Rel(root, filepath.Dir(path))
+				relativePath, err := filepath.Rel(cwd, filepath.Dir(path))
 				if err != nil {
 					return fmt.Errorf("failed to calculate relative path: %w", err)
 				}
@@ -120,8 +128,8 @@ func searchFileInSubDirs(root string, targets map[string]bool) (map[string]strin
 
 		return nil
 	})
-	if err != nil {
-		return nil, err
+	if walkErr != nil {
+		return nil, walkErr
 	}
 	return result, nil
 }

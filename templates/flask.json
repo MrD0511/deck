@@ -1,0 +1,7 @@
+{
+    "framework" : "flask",
+    "base_image" : "python:3.11-slim",
+    "work_dir" : "/app",
+    "requirements_file" : "requirements.txt",
+    "run_command" : "python -m flask run --port=3001"
+}

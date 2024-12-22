@@ -294,6 +294,7 @@ func PrintTechStackReport(reports []TechStackReport) {
 			FrameworkColor.Printf("%-10s\n", report.Framework)
 		}
 	}
+	fmt.Println("")
 }
 
 // func main() {

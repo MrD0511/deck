@@ -296,14 +296,3 @@ func PrintTechStackReport(reports []TechStackReport) {
 	}
 	fmt.Println("")
 }
-
-// func main() {
-// 	reports, err := detectFramework()
-// 	if err != nil {
-// 		fmt.Println("Error:", err)
-// 		return
-// 	}
-
-// 	// Print the report
-// 	printTechStackReport(reports)
-// }

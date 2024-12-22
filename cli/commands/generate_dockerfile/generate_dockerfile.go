@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/MrD0511/deck/internal/stack"
@@ -41,12 +42,16 @@ func GeneateCommand() *cobra.Command{
 				return
 			}
 
-			generate_dockerfile_procedure(dir)
+			err = generate_dockerfile_procedure(dir)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 		},
 	}
 }
 
-func generate_dockerfile_procedure(dir string) {
+func generate_dockerfile_procedure(dir string) error{
 
 	fmt.Println("Detecting the framework...")
 
@@ -58,19 +63,36 @@ func generate_dockerfile_procedure(dir string) {
 
 	stack.PrintTechStackReport(detected_frameworks_report)
 
+	var selected_option map[string]string
+
 	if len(detected_frameworks_report)>1 {
 		fmt.Println("More than one framework detected in the given directory. Please select one(working directory).")
 
-		var selectedDir string
-		promptToSelectDir(detected_frameworks_report, &selectedDir)
-
-
+		selected_option, err = promptToSelectDir(detected_frameworks_report)
+		if err != nil {
+			return err
+		}
+	}else{
+		fmt.Println("No frameworks found")
+		selected_option, err = addCustomeDirNFramework()
+		if err != nil {
+			return err
+		}
 	}
 
+	if string(selected_option["Framework"]) == "unknown" {
+		var selected_framework string
+		promptToSelectFramework(&selected_framework)
+		selected_option["Framework"] = strings.ToLower(selected_framework)
+	}
+	
+	fmt.Println(selected_option)
+
+	return nil
 }	
 
 //func to select a dir form given options
-func promptToSelectDir(framework_report []stack.TechStackReport, selected *string) error{
+func promptToSelectDir(framework_report []stack.TechStackReport) (map[string]string, error){
 	var options []string
 
 	//fetching dir and framework from framework report
@@ -78,7 +100,7 @@ func promptToSelectDir(framework_report []stack.TechStackReport, selected *strin
 
 		option := "option" 		//random string for var initialization
 		if report.Directory == "." {
-			option = fmt.Sprintf("%s (%s)", "current Directory", report.Framework)
+			option = fmt.Sprintf("%s (%s)", "Current directory", report.Framework)
 		}else{
 			option = fmt.Sprintf("%s (%s)", report.Directory, report.Framework)
 		}
@@ -96,19 +118,31 @@ func promptToSelectDir(framework_report []stack.TechStackReport, selected *strin
 		Default: options[0],
 	}
 
-	err := survey.AskOne(prompt, selected)
+	var selected_option string
+	err := survey.AskOne(prompt, &selected_option)
 	if err != nil {
-		return err
+		fmt.Println(err)
+		return nil, err
 	}
 
-	if *selected == "Add custom directory" {
-		err := promptToAddCustomDir(selected)
-		if err != nil {
-			return err
-		}
-	}
+	if selected_option == "Add custom directory" {
+		return addCustomeDirNFramework()
+	}	
 
-	return nil
+
+	selected_option= strings.Replace(selected_option, "Current directory", ".", 1)
+
+    for _, report := range framework_report {
+		option := fmt.Sprintf("%s (%s)", report.Directory, report.Framework)
+        if selected_option == option {
+            return map[string]string{
+                "Directory": report.Directory,
+                "Framework": string(report.Framework),
+            }, nil
+        }
+    }
+
+    return nil, fmt.Errorf("invalid selection")
 }
 
 func promptToAddCustomDir(selected *string) error{
@@ -141,3 +175,41 @@ func promptToAddCustomDir(selected *string) error{
 
 	return nil
 }
+
+func promptToSelectFramework(selected *string) error{
+	options := [6]string{"React", "Angular", "Flask", "FastAPI", "Django", "Gin"}
+
+	prompt := &survey.Select{
+		Message: "Select a Framework",
+		Options: options[:],
+		Default: options[0],
+	}
+
+	err := survey.AskOne(prompt, selected)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	return nil
+}
+
+func addCustomeDirNFramework() (map[string]string, error) {
+	var custom_dir string
+	err := promptToAddCustomDir(&custom_dir)
+	if err != nil {
+		return nil, err
+	}
+
+	var custom_framework string
+	err = promptToSelectFramework(&custom_framework)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]string{
+		"Directory" : custom_dir,
+		"Framework" : custom_framework,
+	}, nil
+}
+

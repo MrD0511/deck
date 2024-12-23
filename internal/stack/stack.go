@@ -296,3 +296,4 @@ func PrintTechStackReport(reports []TechStackReport) {
 	}
 	fmt.Println("")
 }
+

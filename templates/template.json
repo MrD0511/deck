@@ -1,0 +1,74 @@
+{
+    "templates": {
+        "flask": {
+            "framework": "flask",
+            "base_image": "python:3.11-slim",
+            "work_dir": "/app",
+            "requirements_file": "requirements.txt",
+            "run_command": "python -m flask run --port=3001"
+        },
+        "express": {
+            "framework": "express",
+            "base_image": "node:18-slim",
+            "work_dir": "/usr/src/app",
+            "requirements_file": "package.json",
+            "run_command": "npm start"
+        },
+        "react": {
+            "framework": "react",
+            "base_image": "node:18-slim",
+            "work_dir": "/usr/src/app",
+            "requirements_file": "package.json",
+            "run_command": "npm run start"
+        },
+        "angular": {
+            "framework": "angular",
+            "base_image": "node:18-slim",
+            "work_dir": "/usr/src/app",
+            "requirements_file": "package.json",
+            "run_command": "ng serve --host 0.0.0.0 --port 4200"
+        },
+        "django": {
+            "framework": "django",
+            "base_image": "python:3.11-slim",
+            "work_dir": "/app",
+            "requirements_file": "requirements.txt",
+            "run_command": "python manage.py runserver 0.0.0.0:8000"
+        },
+        "fastapi": {
+            "framework": "fastapi",
+            "base_image": "python:3.11-slim",
+            "work_dir": "/app",
+            "requirements_file": "requirements.txt",
+            "run_command": "uvicorn app.main:app --host 0.0.0.0 --port 8000"
+        },
+        "rails": {
+            "framework": "rails",
+            "base_image": "ruby:3.2-slim",
+            "work_dir": "/app",
+            "requirements_file": "Gemfile",
+            "run_command": "rails server -b 0.0.0.0 -p 3000"
+        },
+        "spring_boot": {
+            "framework": "spring_boot",
+            "base_image": "openjdk:17-jdk-slim",
+            "work_dir": "/app",
+            "requirements_file": "pom.xml",
+            "run_command": "java -jar target/app.jar"
+        },
+        "laravel": {
+            "framework": "laravel",
+            "base_image": "php:8.2-apache",
+            "work_dir": "/var/www/html",
+            "requirements_file": "composer.json",
+            "run_command": "apache2-foreground"
+        },
+        "nextjs": {
+            "framework": "nextjs",
+            "base_image": "node:18-slim",
+            "work_dir": "/usr/src/app",
+            "requirements_file": "package.json",
+            "run_command": "npm run start"
+        }
+    }
+}

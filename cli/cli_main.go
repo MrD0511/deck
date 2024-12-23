@@ -4,7 +4,6 @@ import (
 	// "fmt"
 
 	"github.com/spf13/cobra"
-
 	"github.com/MrD0511/deck/cli/commands/generate_dockerfile"
 )
 
@@ -14,7 +13,7 @@ func Cli_main(){
 		Short: "A tool to simplify docker container generation and handling.",
 	}
 
-	rootCmd.AddCommand(generatedockerfile.GeneateCommand())
+	rootCmd.AddCommand(generate_dockerfile.GeneateCommand())
 	rootCmd.Execute()
 }
 

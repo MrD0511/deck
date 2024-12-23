@@ -1,15 +1,32 @@
-package generatedockerfile
+package generate_dockerfile
 
 import (
+	"encoding/json"
 	"fmt"
+
+	// "html/template"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/MrD0511/deck/internal/stack"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
+
+type Template struct {
+	Framework  			string `json:"framework"`
+	BaseImage			string `json:"base_image"`
+	WorkDir				string `json:"work_dir"`
+	RequirementsFile	string `json:"requirements_file"`
+	RunCommand			string `json:"run_command"`	
+}
+
+type Templates struct {
+	Templates map[string]Template `json:"templates"`
+}
 
 func GeneateCommand() *cobra.Command{
 	return &cobra.Command{
@@ -85,8 +102,13 @@ func generate_dockerfile_procedure(dir string) error{
 		promptToSelectFramework(&selected_framework)
 		selected_option["Framework"] = strings.ToLower(selected_framework)
 	}
-	
-	fmt.Println(selected_option)
+
+	templates, err := loadTemplates()
+	if err != nil {
+		return err
+	}
+
+	showTemplateByName(templates, selected_option["Framework"])
 
 	return nil
 }	
@@ -213,3 +235,43 @@ func addCustomeDirNFramework() (map[string]string, error) {
 	}, nil
 }
 
+func loadTemplates() (Templates, error) {
+
+	var templates Templates
+
+	file, err := ioutil.ReadFile("./templates/template.json")
+	if err != nil {
+		return templates, fmt.Errorf("failed to read file: %w", err)
+	}
+
+	err = json.Unmarshal(file, &templates)
+	if err != nil {
+		return templates, fmt.Errorf("failed to unmarshal json: %w", err)
+	}
+
+	return templates, nil
+}
+
+func showTemplateByName(templates Templates, frameworkName string) error {
+	template, exists := templates.Templates[frameworkName]
+	if !exists {
+		return fmt.Errorf("framework '%s' not found", frameworkName)
+	}
+
+	// Define colors
+	title := color.New(color.FgCyan, color.Bold).SprintFunc()
+	key := color.New(color.FgBlue).SprintFunc()
+	value := color.New(color.FgGreen).SprintFunc()
+
+	// Display the template with color
+	fmt.Println("")
+	fmt.Printf("%s %s\n", title("Template for:"), value(frameworkName))
+	fmt.Printf("%s: %s\n", key("Framework"), value(template.Framework))
+	fmt.Printf("%s: %s\n", key("Base Image"), value(template.BaseImage))
+	fmt.Printf("%s: %s\n", key("Work Directory"), value(template.WorkDir))
+	fmt.Printf("%s: %s\n", key("Requirements File"), value(template.RequirementsFile))
+	fmt.Printf("%s: %s\n", key("Run Command"), value(template.RunCommand))
+	fmt.Println("")
+
+	return nil
+} 

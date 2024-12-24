@@ -3,13 +3,10 @@ package generate_dockerfile
 import (
 	"encoding/json"
 	"fmt"
-
-	// "html/template"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
-
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/MrD0511/deck/internal/stack"
 	"github.com/fatih/color"
@@ -78,18 +75,24 @@ func generate_dockerfile_procedure(dir string) error{
 		fmt.Println(err)
 	}
 
-	stack.PrintTechStackReport(detected_frameworks_report)
-
+	
 	var selected_option map[string]string
-
+	
 	if len(detected_frameworks_report)>1 {
+		stack.PrintTechStackReport(detected_frameworks_report)
+		
 		fmt.Println("More than one framework detected in the given directory. Please select one(working directory).")
 
 		selected_option, err = promptToSelectDir(detected_frameworks_report)
 		if err != nil {
 			return err
 		}
-	}else{
+	}else if len(detected_frameworks_report) == 1{
+		selected_option = map[string]string{
+			"Directory" : string(detected_frameworks_report[0].Directory),
+			"Framework" : string(detected_frameworks_report[0].Framework),
+		}
+	}else {			
 		fmt.Println("No frameworks found")
 		selected_option, err = addCustomeDirNFramework()
 		if err != nil {
@@ -107,8 +110,20 @@ func generate_dockerfile_procedure(dir string) error{
 	if err != nil {
 		return err
 	}
+	
+	fmt.Println(selected_option)
+	template, exists := templates.Templates[strings.ToLower(selected_option["Framework"])]
+	if !exists {
+		return fmt.Errorf("framework '%s' not found", selected_option["Framework"])
+	}
 
-	showTemplateByName(templates, selected_option["Framework"])
+	template, err = showTemplateByName(template)
+	if err != nil {
+		return err
+	}
+
+
+	fmt.Println(template)
 
 	return nil
 }	
@@ -170,6 +185,7 @@ func promptToSelectDir(framework_report []stack.TechStackReport) (map[string]str
 func promptToAddCustomDir(selected *string) error{
 	prompt := &survey.Input{
 		Message: "Add custom working directory:",
+		Default: ".",
 	}
 
 	err := survey.AskOne(prompt, selected)
@@ -252,11 +268,7 @@ func loadTemplates() (Templates, error) {
 	return templates, nil
 }
 
-func showTemplateByName(templates Templates, frameworkName string) error {
-	template, exists := templates.Templates[frameworkName]
-	if !exists {
-		return fmt.Errorf("framework '%s' not found", frameworkName)
-	}
+func showTemplateByName(template Template) (Template, error) {
 
 	// Define colors
 	title := color.New(color.FgCyan, color.Bold).SprintFunc()
@@ -265,14 +277,64 @@ func showTemplateByName(templates Templates, frameworkName string) error {
 
 	// Display the template with color
 	fmt.Println("")
-	fmt.Printf("%s %s\n", title("Template for:"), value(frameworkName))
+	fmt.Printf("%s %s\n", title("Template for:"), value(template.Framework))
 	fmt.Printf("%s: %s\n", key("Framework"), value(template.Framework))
 	fmt.Printf("%s: %s\n", key("Base Image"), value(template.BaseImage))
 	fmt.Printf("%s: %s\n", key("Work Directory"), value(template.WorkDir))
 	fmt.Printf("%s: %s\n", key("Requirements File"), value(template.RequirementsFile))
 	fmt.Printf("%s: %s\n", key("Run Command"), value(template.RunCommand))
+
+	var customize bool
+	survey.AskOne(&survey.Confirm{
+		Message: "Do you want to customize this template?",
+		Default: false,
+	}, &customize)
 	fmt.Println("")
 
-	return nil
+	if customize {
+		overwriteTemplateOutput(9)
+		template = customize_template(template)
+		overwriteTemplateOutput(15)
+		showTemplateByName(template)
+	}
+
+	return template, nil
 } 
 
+func customize_template(template Template) Template {
+
+	survey.AskOne(&survey.Input{
+		Message: "Framework:",
+		Default: template.Framework,
+	}, &template.Framework)
+
+	survey.AskOne(&survey.Input{
+		Message: "Base Image:",
+		Default: template.BaseImage,
+	}, &template.BaseImage)
+
+	survey.AskOne(&survey.Input{
+		Message: "Working Dir:",
+		Default: template.WorkDir,
+	}, &template.WorkDir)
+
+	survey.AskOne(&survey.Input{
+		Message: "Requirements file name:",
+		Default: template.RequirementsFile,
+	}, &template.RequirementsFile)
+
+	survey.AskOne(&survey.Input{
+		Message: "Run command:",
+		Default: template.RunCommand,
+	}, &template.RunCommand)
+
+	return template
+}	
+
+func overwriteTemplateOutput(lines int) {
+	// Overwrite the template part with blank lines
+	for i := 0; i < lines; i++ {
+		fmt.Print("\033[1A") // Move up 3 lines
+		fmt.Print("\033[2K") // Clear the current line
+	}
+}

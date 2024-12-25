@@ -7,23 +7,16 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/MrD0511/deck/internal/createDockerfiles"
 	"github.com/MrD0511/deck/internal/stack"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
+	"github.com/MrD0511/deck/templates"
 )
 
-type Template struct {
-	Framework  			string `json:"framework"`
-	BaseImage			string `json:"base_image"`
-	WorkDir				string `json:"work_dir"`
-	RequirementsFile	string `json:"requirements_file"`
-	RunCommand			string `json:"run_command"`	
-}
 
-type Templates struct {
-	Templates map[string]Template `json:"templates"`
-}
 
 func GeneateCommand() *cobra.Command{
 	return &cobra.Command{
@@ -123,8 +116,11 @@ func generate_dockerfile_procedure(dir string) error{
 	}
 
 
-	fmt.Println(template)
-
+	err = createDockerfiles.CreateDockerfileByTemplate(template, selected_option["Directory"])
+	if err != nil {
+		return err
+	}
+	
 	return nil
 }	
 
@@ -251,9 +247,9 @@ func addCustomeDirNFramework() (map[string]string, error) {
 	}, nil
 }
 
-func loadTemplates() (Templates, error) {
+func loadTemplates() (templates.Templates, error) {
 
-	var templates Templates
+	var templates templates.Templates
 
 	file, err := ioutil.ReadFile("./templates/template.json")
 	if err != nil {
@@ -268,7 +264,7 @@ func loadTemplates() (Templates, error) {
 	return templates, nil
 }
 
-func showTemplateByName(template Template) (Template, error) {
+func showTemplateByName(template templates.Template) (templates.Template, error) {
 
 	// Define colors
 	title := color.New(color.FgCyan, color.Bold).SprintFunc()
@@ -301,7 +297,7 @@ func showTemplateByName(template Template) (Template, error) {
 	return template, nil
 } 
 
-func customize_template(template Template) Template {
+func customize_template(template templates.Template) templates.Template {
 
 	survey.AskOne(&survey.Input{
 		Message: "Framework:",

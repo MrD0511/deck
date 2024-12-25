@@ -10,21 +10,21 @@
         "express": {
             "framework": "express",
             "base_image": "node:18-slim",
-            "work_dir": "/usr/src/app",
+            "work_dir": "/usr/src/app/",
             "requirements_file": "package.json",
             "run_command": "npm start"
         },
         "react": {
             "framework": "react",
             "base_image": "node:18-slim",
-            "work_dir": "/usr/src/app",
+            "work_dir": "/usr/src/app/",
             "requirements_file": "package.json",
             "run_command": "npm run start"
         },
         "angular": {
             "framework": "angular",
             "base_image": "node:18-slim",
-            "work_dir": "/usr/src/app",
+            "work_dir": "/usr/src/app/",
             "requirements_file": "package.json",
             "run_command": "ng serve --host 0.0.0.0 --port 4200"
         },
@@ -66,7 +66,7 @@
         "nextjs": {
             "framework": "nextjs",
             "base_image": "node:18-slim",
-            "work_dir": "/usr/src/app",
+            "work_dir": "/usr/src/app/",
             "requirements_file": "package.json",
             "run_command": "npm run start"
         }

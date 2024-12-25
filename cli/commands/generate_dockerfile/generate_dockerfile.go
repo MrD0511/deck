@@ -1,9 +1,7 @@
 package generate_dockerfile
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -99,10 +97,11 @@ func generate_dockerfile_procedure(dir string) error{
 		selected_option["Framework"] = strings.ToLower(selected_framework)
 	}
 
-	templates, err := loadTemplates()
+	templates, err := templates.Get_frameworks_template()
 	if err != nil {
 		return err
 	}
+	fmt.Println(templates)
 	
 	fmt.Println(selected_option)
 	template, exists := templates.Templates[strings.ToLower(selected_option["Framework"])]
@@ -247,22 +246,6 @@ func addCustomeDirNFramework() (map[string]string, error) {
 	}, nil
 }
 
-func loadTemplates() (templates.Templates, error) {
-
-	var templates templates.Templates
-
-	file, err := ioutil.ReadFile("./templates/template.json")
-	if err != nil {
-		return templates, fmt.Errorf("failed to read file: %w", err)
-	}
-
-	err = json.Unmarshal(file, &templates)
-	if err != nil {
-		return templates, fmt.Errorf("failed to unmarshal json: %w", err)
-	}
-
-	return templates, nil
-}
 
 func showTemplateByName(template templates.Template) (templates.Template, error) {
 

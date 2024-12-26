@@ -101,7 +101,6 @@ func generate_dockerfile_procedure(dir string) error{
 	if err != nil {
 		return err
 	}
-	fmt.Println(templates)
 	
 	fmt.Println(selected_option)
 	template, exists := templates.Templates[strings.ToLower(selected_option["Framework"])]

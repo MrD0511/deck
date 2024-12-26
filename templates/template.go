@@ -5,6 +5,7 @@ type Template struct {
 	BaseImage        string `json:"base_image"`
 	WorkDir          string `json:"work_dir"`
 	RequirementsFile string `json:"requirements_file"`
+	Port 			 string `json:"port"`
 	RunCommand       string `json:"run_command"`
 }
 

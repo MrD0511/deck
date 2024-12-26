@@ -1,6 +1,5 @@
 package templates
 
-
 const FlaskDockerfileDevTemplate = `
 # Dockerfile for Flask (Development)
 
@@ -15,7 +14,9 @@ RUN pip install --no-cache-dir -r {{.RequirementsFile}}
 # Copy application code
 COPY . /app/
 
-CMD ["sh", "-c", "{{.RunCommand}}"]
+EXPOSE {{.Port}}
+
+CMD ["sh", "-c", "{{.RunCommand}} --port={{.Port}}"]
 `
 
 const DjangoDockerfileDevTemplate = `
@@ -31,7 +32,9 @@ RUN pip install -r {{.RequirementsFile}}
 
 COPY . .
 
-CMD ["sh", "-c", "{{.RunCommand}}"]
+EXPOSE {{.Port}}
+
+CMD ["sh", "-c", "{{.RunCommand}}","{{.Port}}"]
 `
 
 const NodejsDockerfileDevTemplate = `
@@ -47,7 +50,9 @@ RUN npm install
 
 COPY . .
 
-CMD ["sh", "-c", "{{.RunCommand}}"]
+EXPOSE {{.Port}}
+
+CMD ["sh", "-c", "{{.RunCommand}} --port={{.Port}}"]
 `
 
 const ReactDockerfileDevTemplate = `
@@ -63,7 +68,9 @@ RUN npm install
 
 COPY . .
 
-CMD ["sh", "-c", "{{.RunCommand}}"]
+EXPOSE {{.Port}}
+
+CMD ["sh", "-c", "{{.RunCommand}} --port={{.Port}}"]
 `
 
 const GolangDockerfileDevTemplate = `
@@ -79,9 +86,10 @@ RUN go mod download
 
 COPY . .
 
-CMD ["sh", "-c", "{{.RunCommand}}"]
-`
+EXPOSE {{.Port}}
 
+CMD ["sh", "-c", "{{.RunCommand}} --port={{.Port}}"]
+`
 
 const AngularDockerfileDevTemplate = `
 # Dockerfile for Angular (Development)
@@ -96,8 +104,10 @@ RUN npm install
 
 COPY . .
 
-CMD ["sh", "-c", "{{.RunCommand}}"]`
+EXPOSE {{.Port}}
 
+CMD ["sh", "-c", "{{.RunCommand}} --port {{.Port}}"]
+`
 
 const FastAPIDockerfileDevTemplate = `
 # Dockerfile for FastAPI (Development)
@@ -112,7 +122,9 @@ RUN pip install -r {{.RequirementsFile}}
 
 COPY . .
 
-CMD ["sh", "-c", "{{.RunCommand}}"]
+EXPOSE {{.Port}}
+
+CMD ["sh", "-c", "{{.RunCommand}} --port={{.Port}}"]
 `
 
 const ExpressDockerfileDevTemplate = `
@@ -128,6 +140,7 @@ RUN npm install
 
 COPY . .
 
-CMD ["sh", "-c", "{{.RunCommand}}"]
-`
+EXPOSE {{.Port}}
 
+CMD ["sh", "-c", "{{.RunCommand}} --port={{.Port}}"]
+`

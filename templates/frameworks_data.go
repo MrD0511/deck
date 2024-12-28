@@ -81,14 +81,4 @@ var Frameworks_template = map[string]interface{}{
 	},
 }
 
-// Mapping of development templates to their corresponding frameworks
-var DockerfileDevTemplates = map[string]string{
-	"flask":   FlaskDockerfileDevTemplate,
-	"django":  DjangoDockerfileDevTemplate,
-	"nodejs":  NodejsDockerfileDevTemplate,
-	"react":   ReactDockerfileDevTemplate,
-	"golang":  GolangDockerfileDevTemplate,
-	"angular": AngularDockerfileDevTemplate,
-	"fastapi": FastAPIDockerfileDevTemplate,
-	"express": ExpressDockerfileDevTemplate,
-}
+

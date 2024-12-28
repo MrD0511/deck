@@ -16,7 +16,7 @@ var Frameworks_template = map[string]interface{}{
 			"work_dir":         "/usr/src/app/",
 			"requirements_file": "package.json",
 			"port":             "3000",
-			"run_command":      "npm start --host=0.0.0.0 --port={{.Port}}",
+			"run_command":      "npm start --host=0.0.0.0",
 		},
 		"react": map[string]interface{}{
 			"framework":        "react",
@@ -40,7 +40,7 @@ var Frameworks_template = map[string]interface{}{
 			"work_dir":         "/app",
 			"requirements_file": "requirements.txt",
 			"port":             "8000",
-			"run_command":      "python manage.py runserver 0.0.0.0:",
+			"run_command":      "python manage.py runserver",
 		},
 		"fastapi": map[string]interface{}{
 			"framework":        "fastapi",

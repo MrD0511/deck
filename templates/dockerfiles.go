@@ -34,7 +34,7 @@ COPY . .
 
 EXPOSE {{.Port}}
 
-CMD ["sh", "-c", "{{.RunCommand}}","{{.Port}}"]
+CMD ["sh", "-c", "{{.RunCommand}} 0.0.0.0:{{.Port}}"]
 `
 
 const NodejsDockerfileDevTemplate = `

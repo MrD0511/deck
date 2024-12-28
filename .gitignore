@@ -1,3 +1,8 @@
 test_framework_folders/
 go.sum
-test_folders/
+test_folders/angular_app/node_modules
+test_folders/django_app/venv
+test_folders/node_app/node_modules
+test_folders/myapp/node_modules
+test_folders/flask/venv
+test_folders/fastapi_app/venv

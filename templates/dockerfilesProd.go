@@ -7,21 +7,32 @@ FROM {{.BaseImage}} as builder
 
 WORKDIR {{.WorkDir}}
 
-# Install dependencies
-COPY {{.RequirementsFile}} /app/
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies in a virtual environment
+RUN python -m venv /venv
+ENV PATH="/venv/bin:$PATH"
+
+COPY {{.RequirementsFile}} ./
 RUN pip install --no-cache-dir -r {{.RequirementsFile}}
 
 # Copy application code
-COPY . /app/
+COPY . .
 
 # Final production image
 FROM {{.BaseImage}}
 
 WORKDIR {{.WorkDir}}
 
-COPY --from=builder /usr/local/lib /usr/local/lib
-COPY --from=builder /usr/local/bin /usr/local/bin
-COPY --from=builder /usr/local/include /usr/local/include
+# Set environment variables
+ENV PATH="/venv/bin:$PATH"
+
+# Copy virtual environment and application from the builder stage
+COPY --from=builder /venv /venv
+COPY --from=builder {{.WorkDir}} {{.WorkDir}}
 
 EXPOSE {{.Port}}
 
@@ -35,7 +46,16 @@ FROM {{.BaseImage}} as builder
 
 WORKDIR {{.WorkDir}}
 
-COPY {{.RequirementsFile}} {{.WorkDir}}
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies in a virtual environment
+RUN python -m venv /venv
+ENV PATH="/venv/bin:$PATH"
+
+COPY {{.RequirementsFile}} ./
 RUN pip install --no-cache-dir -r {{.RequirementsFile}}
 
 COPY . .
@@ -45,6 +65,11 @@ FROM {{.BaseImage}}
 
 WORKDIR {{.WorkDir}}
 
+# Set environment variables
+ENV PATH="/venv/bin:$PATH"
+
+# Copy virtual environment and application from the builder stage
+COPY --from=builder /venv /venv
 COPY --from=builder {{.WorkDir}} {{.WorkDir}}
 
 EXPOSE {{.Port}}
@@ -134,7 +159,9 @@ FROM {{.BaseImage}} as builder
 WORKDIR {{.WorkDir}}
 
 COPY package.json package-lock.json {{.WorkDir}}
-RUN npm install --production
+
+# Install the Angular CLI globally and production dependencies
+RUN npm install -g @angular/cli && npm install 
 
 COPY . .
 RUN npm run build --prod
@@ -144,7 +171,7 @@ FROM nginx:alpine
 
 WORKDIR /usr/share/nginx/html
 
-COPY --from=builder /usr/src/app/dist .
+COPY --from=builder /usr/src/app/dist/<your-app-name>/browser .
 
 EXPOSE {{.Port}}
 
@@ -158,7 +185,16 @@ FROM {{.BaseImage}} as builder
 
 WORKDIR {{.WorkDir}}
 
-COPY {{.RequirementsFile}} {{.WorkDir}}
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies in a virtual environment
+RUN python -m venv /venv
+ENV PATH="/venv/bin:$PATH"
+
+COPY {{.RequirementsFile}} ./
 RUN pip install --no-cache-dir -r {{.RequirementsFile}}
 
 COPY . .
@@ -168,6 +204,11 @@ FROM {{.BaseImage}}
 
 WORKDIR {{.WorkDir}}
 
+# Set environment variables
+ENV PATH="/venv/bin:$PATH"
+
+# Copy virtual environment and application from the builder stage
+COPY --from=builder /venv /venv
 COPY --from=builder {{.WorkDir}} {{.WorkDir}}
 
 EXPOSE {{.Port}}

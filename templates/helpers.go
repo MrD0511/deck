@@ -21,10 +21,21 @@ func Get_frameworks_template() (Templates, error) {
 	return templates, nil
 } 
 
-func GetDockerfileTemplate(framework string) (string, error) {
-	templ, exists := DockerfileDevTemplates[framework]
-	if !exists {
-		return "", fmt.Errorf("framework not found")
+func GetDockerfileTemplate(framework string, isDev bool) (string, error) {
+
+	var templ string
+	var exists bool
+
+	if isDev {
+		templ, exists = DockerfileDevTemplates[framework]
+		if !exists {
+			return "", fmt.Errorf("framework not found")
+		}
+	}else {
+		templ, exists = DockerfileProdTemplates[framework]
+		if !exists {
+			return "", fmt.Errorf("framework not found")
+		}
 	}
 
 	return templ, nil

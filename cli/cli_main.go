@@ -13,7 +13,7 @@ func Cli_main(){
 		Short: "A tool to simplify docker container generation and handling.",
 	}
 
-	rootCmd.AddCommand(generate_dockerfile.GeneateCommand())
+	rootCmd.AddCommand(generate_dockerfile.GenerateCommand())
 	rootCmd.Execute()
 }
 

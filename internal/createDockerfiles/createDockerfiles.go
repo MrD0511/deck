@@ -11,9 +11,9 @@ import (
 	"github.com/MrD0511/deck/templates"
 )
 
-func CreateDockerfileByTemplate (dockerfile_values_template templates.Template, dir string) error {
+func CreateDockerfileByTemplate (dockerfile_values_template templates.Template, dir string, isDev bool) error {
 
-	dockerfile_template, err := templates.GetDockerfileTemplate(dockerfile_values_template.Framework)
+	dockerfile_template, err := templates.GetDockerfileTemplate(dockerfile_values_template.Framework, isDev)
 	if err != nil {
 		return err
 	}

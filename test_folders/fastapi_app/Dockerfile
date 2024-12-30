@@ -1,27 +1,36 @@
-# Stage 1: Builder
-FROM python:3.11-slim AS builder
+
+# Dockerfile for FastAPI (Production)
+
+FROM python:3.11-slim as builder
 
 WORKDIR /app
 
-# Install dependencies only
-COPY requirements.txt /app/
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies in a virtual environment
+RUN python -m venv /venv
+ENV PATH="/venv/bin:$PATH"
+
+COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Stage 2: Final (Production)
+COPY . .
+
+# Final production image
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy only necessary artifacts from the builder stage
-COPY --from=builder /usr/local/lib/python3.11 /usr/local/lib/python3.11
-COPY --from=builder /usr/local/bin /usr/local/bin
-COPY --from=builder /usr/local/include /usr/local/include
+# Set environment variables
+ENV PATH="/venv/bin:$PATH"
 
-# Copy application code
-COPY . .
+# Copy virtual environment and application from the builder stage
+COPY --from=builder /venv /venv
+COPY --from=builder /app /app
 
-# Expose the application port
 EXPOSE 8000
 
-# Command to run the FastAPI app
-CMD ["uvicorn", "app.main:app", "--host=0.0.0.0", "--port=8000"]
+CMD ["sh", "-c", "uvicorn app.main:app --host=0.0.0.0 --host=0.0.0.0 --port=8000"]

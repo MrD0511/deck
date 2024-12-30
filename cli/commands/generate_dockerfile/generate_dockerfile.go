@@ -14,29 +14,31 @@ import (
 	"github.com/MrD0511/deck/templates"
 )
 
+func GenerateCommand() *cobra.Command{
 
+	var dev bool
+	var prod bool
 
-func GeneateCommand() *cobra.Command{
-	return &cobra.Command{
+	generate_cmd := &cobra.Command{
 		Use: "generate",
 		Short: "Generate a dockerfile",
 		Args: cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string){
 
 			dir := args[0]
-			cwd, err := os.Getwd()
+			cwd, err := os.Getwd()    //get current dir
 
 			if err != nil {
 				return
 			}
 
-			if dir == "." {
+			if dir == "." {			//if . then current directory
 				dir = cwd
 			}else{
-				dir = filepath.Join(cwd, dir)
+				dir = filepath.Join(cwd, dir)  		//if dir is given then join the current dir path and the path given
 			}
 
-			info, err := os.Stat(dir)
+			info, err := os.Stat(dir)			//check if dir exists
 			if os.IsNotExist(err) {
 				fmt.Printf("Directory does not exist: %s\n", dir)
 				return
@@ -47,16 +49,38 @@ func GeneateCommand() *cobra.Command{
 				return
 			}
 
-			err = generate_dockerfile_procedure(dir)
+
+			// Ensure exactly one of the flags is set
+			if (dev && prod) || (!dev && !prod) {
+
+				if !dev && !prod {
+					prod = true
+				}
+
+				fmt.Println("Please specify exactly one of the following flags: --dev or --prod.")
+				return
+			}
+
+			// Print out the flags for debugging
+			fmt.Println("dev:", dev)
+			fmt.Println("prod:", prod)
+
+			err = generate_dockerfile_procedure(dir, dev)
 			if err != nil {
 				fmt.Println(err)
 				return
 			}
 		},
 	}
+
+	generate_cmd.Flags().BoolVarP(&dev, "dev", "d", false, "Generate Dockerfile for development")
+	generate_cmd.Flags().BoolVarP(&prod, "prod", "p", false, "Generate Dockerfile for production")
+
+	return generate_cmd
 }
 
-func generate_dockerfile_procedure(dir string) error{
+
+func generate_dockerfile_procedure(dir string, isDev bool) error{
 
 	fmt.Println("Detecting the framework...")
 
@@ -65,7 +89,6 @@ func generate_dockerfile_procedure(dir string) error{
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	
 	var selected_option map[string]string
 	
@@ -102,7 +125,6 @@ func generate_dockerfile_procedure(dir string) error{
 		return err
 	}
 	
-	fmt.Println(selected_option)
 	template, exists := templates.Templates[strings.ToLower(selected_option["Framework"])]
 	if !exists {
 		return fmt.Errorf("framework '%s' not found", selected_option["Framework"])
@@ -114,7 +136,7 @@ func generate_dockerfile_procedure(dir string) error{
 	}
 
 
-	err = createDockerfiles.CreateDockerfileByTemplate(template, selected_option["Directory"])
+	err = createDockerfiles.CreateDockerfileByTemplate(template, selected_option["Directory"], isDev)
 	if err != nil {
 		return err
 	}

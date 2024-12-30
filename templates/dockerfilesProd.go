@@ -19,11 +19,13 @@ FROM {{.BaseImage}}
 
 WORKDIR {{.WorkDir}}
 
-COPY --from=builder /app /app
+COPY --from=builder /usr/local/lib /usr/local/lib
+COPY --from=builder /usr/local/bin /usr/local/bin
+COPY --from=builder /usr/local/include /usr/local/include
 
 EXPOSE {{.Port}}
 
-CMD ["sh", "-c", "{{.RunCommand}} --host=0.0.0.0 --port={{.Port}}"]
+CMD ["sh", "-c", "gunicorn app:app --bind 0.0.0.0:{{.Port}}"]
 `
 
 const DjangoDockerfileProdTemplate = `
@@ -82,7 +84,7 @@ FROM {{.BaseImage}} as builder
 WORKDIR {{.WorkDir}}
 
 COPY package.json package-lock.json {{.WorkDir}}
-RUN npm install
+RUN npm install --production
 
 COPY . .
 RUN npm run build
@@ -132,7 +134,7 @@ FROM {{.BaseImage}} as builder
 WORKDIR {{.WorkDir}}
 
 COPY package.json package-lock.json {{.WorkDir}}
-RUN npm install
+RUN npm install --production
 
 COPY . .
 RUN npm run build --prod

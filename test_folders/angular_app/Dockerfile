@@ -11,14 +11,14 @@ COPY package.json package-lock.json /usr/src/app/
 RUN npm install -g @angular/cli && npm install 
 
 COPY . .
-RUN npm run build --prod
+RUN npm run build --prod -- --output-path=dist/build
 
 # Final production image
 FROM nginx:alpine
 
 WORKDIR /usr/share/nginx/html
 
-COPY --from=builder /usr/src/app/dist/angular_app/browser ./
+COPY --from=builder /usr/src/app/dist/build/browser .
 
 EXPOSE 4200
 

@@ -9,9 +9,9 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/MrD0511/deck/internal/createDockerfiles"
 	"github.com/MrD0511/deck/internal/stack"
+	"github.com/MrD0511/deck/templates"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-	"github.com/MrD0511/deck/templates"
 )
 
 func GenerateCommand() *cobra.Command{
@@ -60,10 +60,6 @@ func GenerateCommand() *cobra.Command{
 				fmt.Println("Please specify exactly one of the following flags: --dev or --prod.")
 				return
 			}
-
-			// Print out the flags for debugging
-			fmt.Println("dev:", dev)
-			fmt.Println("prod:", prod)
 
 			err = generate_dockerfile_procedure(dir, dev)
 			if err != nil {
@@ -134,7 +130,6 @@ func generate_dockerfile_procedure(dir string, isDev bool) error{
 	if err != nil {
 		return err
 	}
-
 
 	err = createDockerfiles.CreateDockerfileByTemplate(template, selected_option["Directory"], isDev)
 	if err != nil {
@@ -278,6 +273,7 @@ func showTemplateByName(template templates.Template) (templates.Template, error)
 	// Display the template with color
 	fmt.Println("")
 	fmt.Printf("%s %s\n", title("Template for:"), value(template.Framework))
+	fmt.Printf("%s: %s\n", key("App Name"), value(template.AppName))
 	fmt.Printf("%s: %s\n", key("Framework"), value(template.Framework))
 	fmt.Printf("%s: %s\n", key("Base Image"), value(template.BaseImage))
 	fmt.Printf("%s: %s\n", key("Work Directory"), value(template.WorkDir))

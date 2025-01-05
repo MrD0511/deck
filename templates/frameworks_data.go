@@ -82,3 +82,11 @@ var Frameworks_template = map[string]interface{}{
 }
 
 
+var DockerIgnoreTemplate = map[string][]string{
+	"react":   {"node_modules/", "build/", ".env", "Dockerfile", ".git", "public/", "logs/", "coverage/"},
+	"angular": {"node_modules/", "dist/", ".env", "Dockerfile", ".git", "logs/", "coverage/"},
+	"nodejs":  {"node_modules/", "npm-debug.log", "logs/", ".env", "Dockerfile", ".git", "coverage/"},
+	"flask":   {"__pycache__/", ".env", "venv/", "Dockerfile", ".git", "logs/", "instance/", "test.db"},
+	"fastapi": {"__pycache__/", ".env", "venv/", "Dockerfile", ".git", "logs/", "instance/", "test.db"},
+	"django":  {"__pycache__/", ".env", "venv/", "Dockerfile", ".git", "logs/", "db.sqlite3", "media/", "staticfiles/", "instance/", "*.pyc"},
+}

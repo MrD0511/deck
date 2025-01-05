@@ -7,9 +7,9 @@ type Template struct {
 	RequirementsFile string `json:"requirements_file"`
 	Port 			 string `json:"port"`
 	RunCommand       string `json:"run_command"`
-	AppName			 string	`json:"app_name"`
 }
 
 type Templates struct {
 	Templates map[string]Template `json:"templates"`
 }
+

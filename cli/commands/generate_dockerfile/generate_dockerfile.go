@@ -116,12 +116,12 @@ func generate_dockerfile_procedure(dir string, isDev bool) error{
 		selected_option["Framework"] = strings.ToLower(selected_framework)
 	}
 
-	templates, err := templates.Get_frameworks_template()
+	docker_templates, err := templates.Get_frameworks_template()
 	if err != nil {
 		return err
 	}
 	
-	template, exists := templates.Templates[strings.ToLower(selected_option["Framework"])]
+	template, exists := docker_templates.Templates[strings.ToLower(selected_option["Framework"])]
 	if !exists {
 		return fmt.Errorf("framework '%s' not found", selected_option["Framework"])
 	}
@@ -132,6 +132,11 @@ func generate_dockerfile_procedure(dir string, isDev bool) error{
 	}
 
 	err = createDockerfiles.CreateDockerfileByTemplate(template, selected_option["Directory"], isDev)
+	if err != nil {
+		return err
+	}
+	
+	err = createDockerfiles.CreateDockerIgnore(templates.DockerIgnoreTemplate[selected_option["Framework"]], selected_option["Directory"])
 	if err != nil {
 		return err
 	}
@@ -273,7 +278,6 @@ func showTemplateByName(template templates.Template) (templates.Template, error)
 	// Display the template with color
 	fmt.Println("")
 	fmt.Printf("%s %s\n", title("Template for:"), value(template.Framework))
-	fmt.Printf("%s: %s\n", key("App Name"), value(template.AppName))
 	fmt.Printf("%s: %s\n", key("Framework"), value(template.Framework))
 	fmt.Printf("%s: %s\n", key("Base Image"), value(template.BaseImage))
 	fmt.Printf("%s: %s\n", key("Work Directory"), value(template.WorkDir))

@@ -1,8 +1,17 @@
 __pycache__/
+
 .env
+
 venv/
+
 Dockerfile
+
 .git
+
 logs/
+
 instance/
+
 test.db
+
+

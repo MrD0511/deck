@@ -21,7 +21,8 @@ func CreateDockerIgnore(ignored_files []string, dir string) error {
 		return fmt.Errorf("can not write docker ignore: %v", err)
 	}
 
-	return nil
+	fmt.Printf(".dockerignore file successfully created at: %s\n", dockerIgnorePath)
 
+	return nil
 }
 

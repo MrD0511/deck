@@ -213,7 +213,7 @@ COPY --from=builder {{.WorkDir}} {{.WorkDir}}
 
 EXPOSE {{.Port}}
 
-CMD ["sh", "-c", "{{.RunCommand}} --host=0.0.0.0 --port={{.Port}}"]
+CMD ["sh", "-c", "{{.RunCommand}} --port={{.Port}}"]
 `
 
 const ExpressDockerfileProdTemplate = `

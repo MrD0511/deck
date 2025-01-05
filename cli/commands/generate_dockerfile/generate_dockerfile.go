@@ -18,6 +18,7 @@ func GenerateCommand() *cobra.Command{
 
 	var dev bool
 	var prod bool
+	var default_value bool
 
 	generate_cmd := &cobra.Command{
 		Use: "generate",
@@ -49,7 +50,6 @@ func GenerateCommand() *cobra.Command{
 				return
 			}
 
-
 			// Ensure exactly one of the flags is set
 			if (dev && prod) || (!dev && !prod) {
 
@@ -61,7 +61,7 @@ func GenerateCommand() *cobra.Command{
 				return
 			}
 
-			err = generate_dockerfile_procedure(dir, dev)
+			err = generate_dockerfile_procedure(dir, dev, default_value)
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -71,12 +71,12 @@ func GenerateCommand() *cobra.Command{
 
 	generate_cmd.Flags().BoolVarP(&dev, "dev", "d", false, "Generate Dockerfile for development")
 	generate_cmd.Flags().BoolVarP(&prod, "prod", "p", false, "Generate Dockerfile for production")
-
+	generate_cmd.Flags().BoolVarP(&default_value, "force", "f", false, "Force to default values")
 	return generate_cmd
 }
 
 
-func generate_dockerfile_procedure(dir string, isDev bool) error{
+func generate_dockerfile_procedure(dir string, isDev bool, default_value bool) error{
 
 	fmt.Println("Detecting the framework...")
 
@@ -93,10 +93,13 @@ func generate_dockerfile_procedure(dir string, isDev bool) error{
 		
 		fmt.Println("More than one framework detected in the given directory. Please select one(working directory).")
 
-		selected_option, err = promptToSelectDir(detected_frameworks_report)
-		if err != nil {
-			return err
+		if !default_value {
+			selected_option, err = promptToSelectDir(detected_frameworks_report)
+			if err != nil {
+				return err
+			}
 		}
+
 	}else if len(detected_frameworks_report) == 1{
 		selected_option = map[string]string{
 			"Directory" : string(detected_frameworks_report[0].Directory),
@@ -126,9 +129,17 @@ func generate_dockerfile_procedure(dir string, isDev bool) error{
 		return fmt.Errorf("framework '%s' not found", selected_option["Framework"])
 	}
 
-	template, err = showTemplateByName(template)
+	template, err = showTemplateByName(template, default_value)
 	if err != nil {
 		return err
+	}
+
+	ignored_files := []string{}
+	if !default_value {
+		ignored_files, err = editDockerIgnoreTemplate(templates.DockerIgnoreTemplate[selected_option["Framework"]])
+		if err != nil {
+			return err
+		}
 	}
 
 	err = createDockerfiles.CreateDockerfileByTemplate(template, selected_option["Directory"], isDev)
@@ -136,11 +147,11 @@ func generate_dockerfile_procedure(dir string, isDev bool) error{
 		return err
 	}
 	
-	err = createDockerfiles.CreateDockerIgnore(templates.DockerIgnoreTemplate[selected_option["Framework"]], selected_option["Directory"])
+	err = createDockerfiles.CreateDockerIgnore(ignored_files, selected_option["Directory"])
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }	
 
@@ -267,8 +278,7 @@ func addCustomeDirNFramework() (map[string]string, error) {
 	}, nil
 }
 
-
-func showTemplateByName(template templates.Template) (templates.Template, error) {
+func showTemplateByName(template templates.Template, default_value bool) (templates.Template, error) {
 
 	// Define colors
 	title := color.New(color.FgCyan, color.Bold).SprintFunc()
@@ -285,17 +295,20 @@ func showTemplateByName(template templates.Template) (templates.Template, error)
 	fmt.Printf("%s: %s\n", key("Run Command"), value(template.RunCommand))
 
 	var customize bool
-	survey.AskOne(&survey.Confirm{
-		Message: "Do you want to customize this template?",
-		Default: false,
-	}, &customize)
-	fmt.Println("")
+
+	if !default_value {
+		survey.AskOne(&survey.Confirm{
+			Message: "Do you want to customize this template?",
+			Default: false,
+		}, &customize)
+		fmt.Println("")
+	}
 
 	if customize {
 		overwriteTemplateOutput(9)
 		template = customize_template(template)
 		overwriteTemplateOutput(15)
-		showTemplateByName(template)
+		showTemplateByName(template, default_value)
 	}
 
 	return template, nil
@@ -337,4 +350,24 @@ func overwriteTemplateOutput(lines int) {
 		fmt.Print("\033[1A") // Move up 3 lines
 		fmt.Print("\033[2K") // Clear the current line
 	}
+}
+
+func editDockerIgnoreTemplate(ignored_files_template []string) ([]string, error) {
+
+	ignored_files_string := ""
+	for _,entry := range ignored_files_template {
+		ignored_files_string = ignored_files_string + entry + " \n"
+	}
+
+	prompt := &survey.Multiline{
+		Message: "Add more files or folders you would like to ignore saperated by space",
+		Default: ignored_files_string,
+	}
+
+	err := survey.AskOne(prompt, &ignored_files_string)
+	if err != nil {
+		return []string{},err
+	}
+
+	return strings.Split(ignored_files_string, " "), nil
 }

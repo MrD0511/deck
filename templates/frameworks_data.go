@@ -48,7 +48,7 @@ var Frameworks_template = map[string]interface{}{
 			"work_dir":         "/app",
 			"requirements_file": "requirements.txt",
 			"port":             "8000",
-			"run_command":      "uvicorn app.main:app --host=0.0.0.0",
+			"run_command":      "uvicorn app:app --host=0.0.0.0",
 		},
 		"rails": map[string]interface{}{
 			"framework":        "rails",

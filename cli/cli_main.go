@@ -3,8 +3,9 @@ package cli
 import (
 	// "fmt"
 
-	"github.com/spf13/cobra"
+	dasboard_cli "github.com/MrD0511/deck/cli/commands/dasboard"
 	"github.com/MrD0511/deck/cli/commands/generate_dockerfile"
+	"github.com/spf13/cobra"
 )
 
 func Cli_main(){
@@ -14,6 +15,7 @@ func Cli_main(){
 	}
 
 	rootCmd.AddCommand(generate_dockerfile.GenerateCommand())
+	rootCmd.AddCommand(dasboard_cli.DashboardCmd)
 	rootCmd.Execute()
 }
 

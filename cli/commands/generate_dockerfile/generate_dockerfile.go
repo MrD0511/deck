@@ -75,7 +75,6 @@ func GenerateCommand() *cobra.Command{
 	return generate_cmd
 }
 
-
 func generate_dockerfile_procedure(dir string, isDev bool, default_value bool) error{
 
 	fmt.Println("Detecting the framework...")

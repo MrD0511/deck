@@ -7,3 +7,4 @@ deck-cli/test_folders/myapp/node_modules
 deck-cli/test_folders/flask/venv
 deck-cli/test_folders/fastapi_app/venv
 deck-cli/test_folders/
+deck-dashboard/node_modules/

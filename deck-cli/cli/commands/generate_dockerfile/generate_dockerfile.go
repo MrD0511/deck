@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/MrD0511/deck/internal/createDockerfiles"
-	"github.com/MrD0511/deck/internal/stack"
-	"github.com/MrD0511/deck/templates"
+	"github.com/MrD0511/deck/deck-cli/internal/createDockerfiles"
+	"github.com/MrD0511/deck/deck-cli/internal/stack"
+	"github.com/MrD0511/deck/deck-cli/templates"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )

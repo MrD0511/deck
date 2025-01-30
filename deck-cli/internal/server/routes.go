@@ -1,11 +1,16 @@
 package server
 
 import (
-	"net/http"
-	"github.com/MrD0511/deck/internal/server/handlers"
+	"github.com/MrD0511/deck/deck-cli/internal/server/handlers"
+	"github.com/gin-gonic/gin"
 )
 
-func RegisterRoutes(mux *http.ServeMux) {
- 	mux.HandleFunc("/api/pods",handlers.PodsHandler)
+// RegisterRoutes registers all API routes
+func RegisterRoutes(router *gin.Engine) {
+	api := router.Group("/api")
+	{
+		api.GET("/pods", handlers.GetPodsHandler)
+	}
 }
+
 

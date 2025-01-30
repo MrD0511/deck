@@ -1,21 +1,16 @@
 package server
 
 import (
-	// "fmt"
 	"log"
-	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-func StartServer() error {
-	mux := http.NewServeMux()
+// StartServer starts the Gin server
+func StartServer() {
+	router := gin.Default()
+	RegisterRoutes(router)
 
-	RegisterRoutes(mux)
-
-	server := &http.Server{
-		Addr: ":8080",
-		Handler: mux,
-	}
-
-	log.Println("Server is Listening at localhost:8080.")
-	return server.ListenAndServe()
+	log.Println("Server running on :8080")
+	router.Run(":8081")
 }

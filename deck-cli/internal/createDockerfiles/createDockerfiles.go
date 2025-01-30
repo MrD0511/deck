@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"github.com/MrD0511/deck/templates"
+	"github.com/MrD0511/deck/deck-cli/templates"
 )
 
 func CreateDockerfileByTemplate (dockerfile_values_template templates.Template, dir string, isDev bool) error {

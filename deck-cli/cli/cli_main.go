@@ -3,8 +3,8 @@ package cli
 import (
 	// "fmt"
 
-	dasboard_cli "github.com/MrD0511/deck/cli/commands/dasboard"
-	"github.com/MrD0511/deck/cli/commands/generate_dockerfile"
+	dasboard_cli "github.com/MrD0511/deck/deck-cli/cli/commands/dasboard"
+	"github.com/MrD0511/deck/deck-cli/cli/commands/generate_dockerfile"
 	"github.com/spf13/cobra"
 )
 

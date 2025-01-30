@@ -3,7 +3,7 @@ package dasboard_cli
 import (
 	"log"
 
-	"github.com/MrD0511/deck/internal/server"
+	"github.com/MrD0511/deck/deck-cli/internal/server"
 	"github.com/spf13/cobra"
 )
 
@@ -24,8 +24,6 @@ var startCmd = &cobra.Command{
 	Long:  "Start the dashboard server to serve Kubernetes resources on the web.",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Println("Starting the dashboard server...")
-		if err := server.StartServer(); err != nil {
-			log.Fatalf("Error starting the server: %v", err)
-		}
+		server.StartServer()
 	},
 }

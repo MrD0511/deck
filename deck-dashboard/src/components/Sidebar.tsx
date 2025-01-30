@@ -28,11 +28,11 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
         onClick={onToggle}
         className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-md shadow-md"
       >
-        <Menu size={24} />
+      <Menu size={24} />
       </button>
       <div className={`
         fixed top-0 left-0 h-full bg-white shadow-lg transition-transform duration-300 z-40
-        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        ${isOpen ? 'translate-x-0 max-h' : '-translate-x-full lg:translate-x-0'}
         w-64 lg:static
       `}>
         <div className="p-4 border-b">

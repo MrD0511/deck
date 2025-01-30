@@ -10,6 +10,7 @@ func RegisterRoutes(router *gin.Engine) {
 	api := router.Group("/api")
 	{
 		api.GET("/pods", handlers.GetPodsHandler)
+		api.GET("/deployments", handlers.GetDeploymentHandler)
 	}
 }
 

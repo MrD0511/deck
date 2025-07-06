@@ -185,15 +185,6 @@ FROM {{.BaseImage}} as builder
 
 WORKDIR {{.WorkDir}}
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Python dependencies in a virtual environment
-RUN python -m venv /venv
-ENV PATH="/venv/bin:$PATH"
-
 COPY {{.RequirementsFile}} ./
 RUN pip install --no-cache-dir -r {{.RequirementsFile}}
 
@@ -208,7 +199,8 @@ WORKDIR {{.WorkDir}}
 ENV PATH="/venv/bin:$PATH"
 
 # Copy virtual environment and application from the builder stage
-COPY --from=builder /venv /venv
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder {{.WorkDir}} {{.WorkDir}}
 
 EXPOSE {{.Port}}

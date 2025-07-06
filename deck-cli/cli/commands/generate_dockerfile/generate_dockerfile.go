@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/MrD0511/deck/internal/createDockerfiles"
-	"github.com/MrD0511/deck/internal/stack"
-	"github.com/MrD0511/deck/templates"
+	"github.com/MrD0511/deck/deck-cli/internal/createDockerfiles"
+	"github.com/MrD0511/deck/deck-cli/internal/stack"
+	"github.com/MrD0511/deck/deck-cli/templates"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -74,7 +74,6 @@ func GenerateCommand() *cobra.Command{
 	generate_cmd.Flags().BoolVarP(&default_value, "force", "f", false, "Force to default values")
 	return generate_cmd
 }
-
 
 func generate_dockerfile_procedure(dir string, isDev bool, default_value bool) error{
 

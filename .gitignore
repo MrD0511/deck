@@ -1,8 +1,10 @@
 test_framework_folders/
 go.sum
-test_folders/angular_app/node_modules
-test_folders/django_app/venv
-test_folders/node_app/node_modules
-test_folders/myapp/node_modules
-test_folders/flask/venv
-test_folders/fastapi_app/venv
+deck-cli/test_folders/angular_app/node_modules
+deck-cli/test_folders/django_app/venv
+deck-cli/test_folders/node_app/node_modules
+deck-cli/test_folders/myapp/node_modules
+deck-cli/test_folders/flask/venv
+deck-cli/test_folders/fastapi_app/venv
+deck-cli/test_folders/
+deck-dashboard/node_modules/

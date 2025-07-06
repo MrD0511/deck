@@ -2,9 +2,8 @@ package cli
 
 import (
 	// "fmt"
-
+	"github.com/MrD0511/deck/deck-cli/cli/commands/generate_dockerfile"
 	"github.com/spf13/cobra"
-	"github.com/MrD0511/deck/cli/commands/generate_dockerfile"
 )
 
 func Cli_main(){

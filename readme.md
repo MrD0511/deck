@@ -17,8 +17,7 @@ Deck is a blazing-fast, cross-platform CLI tool written in Go that **automatical
 
 - ⚗️ **Dev & Prod Support**  
   Generates both:
-  - `Dockerfile` for production
-  - `Dockerfile.dev` for development (volumes, live reload, etc.)
+  - `Dockerfile` for production and for development
 
 - 📦 **.dockerignore File Generator**  
   Generates `.dockerignore` with standard ignore patterns to reduce image bloat.
